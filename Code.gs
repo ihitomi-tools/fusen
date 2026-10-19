@@ -8,17 +8,35 @@ const CAL_NAME = '🐱ふせん';
 const EVENT_MINUTES = 15; // 予定の長さ（分）
 
 function doGet() {
-  return HtmlService.createHtmlOutputFromFile('index')
+  const out = HtmlService.createHtmlOutputFromFile('index')
     .setTitle('ふせん')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, viewport-fit=cover')
     .addMetaTag('apple-mobile-web-app-capable', 'yes');
+  try { // アイコン（受け付けられない場合は無視）
+    out.setFaviconUrl('https://raw.githubusercontent.com/ihitomi-tools/fusen/main/icons/icon-192.png');
+  } catch (e) {}
+  return out;
 }
 
 // 専用カレンダーを取得（なければ作る）
 function getCal_() {
   const found = CalendarApp.getCalendarsByName(CAL_NAME);
-  if (found.length > 0) return found[0];
-  return CalendarApp.createCalendar(CAL_NAME, { timeZone: 'Asia/Tokyo' });
+  const cal = found.length > 0 ? found[0]
+    : CalendarApp.createCalendar(CAL_NAME, { timeZone: 'Asia/Tokyo' });
+  // 作ったカレンダーが「非表示」だと、スマホに出ず通知も来ないことがあるので表示にする
+  try { cal.setSelected(true); cal.setHidden(false); } catch (e) {}
+  return cal;
+}
+
+// 動作確認用：エディタでこの関数を選んで「実行」→ 実行ログを見る
+function diagnose() {
+  const cal = getCal_();
+  Logger.log('カレンダー名: ' + cal.getName() + ' / ID: ' + cal.getId());
+  Logger.log('同名カレンダーの数: ' + CalendarApp.getCalendarsByName(CAL_NAME).length);
+  const start = new Date(Date.now() + 5 * 60 * 1000);
+  const n = addNote('🐱テスト（消してOK）', start.getTime(), [0], null, 0);
+  Logger.log('テスト予定を作りました: ' + n.id + ' / 開始: ' + start);
+  Logger.log('いまの予定の数: ' + listNotes().length);
 }
 
 function setReminders_(ev, minutesList) {
