@@ -11,8 +11,7 @@ function doGet() {
   const out = HtmlService.createHtmlOutputFromFile('index')
     .setTitle('ねこのて')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, viewport-fit=cover')
-    .addMetaTag('apple-mobile-web-app-capable', 'yes')
-    .addMetaTag('apple-mobile-web-app-title', 'ねこのて');
+    .addMetaTag('apple-mobile-web-app-capable', 'yes');
   try { // アイコン（受け付けられない場合は無視）
     out.setFaviconUrl('https://raw.githubusercontent.com/ihitomi-tools/fusen/main/icons/icon-192.png');
   } catch (e) {}
