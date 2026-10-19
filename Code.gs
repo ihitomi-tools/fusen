@@ -1,5 +1,5 @@
 /**
- * ふせん（Googleカレンダー連携のリマインドメモ）
+ * ねこのて（旧称：ふせん／Googleカレンダー連携のリマインドメモ）
  * 専用カレンダー「🐱ふせん」に予定として登録し、
  * カレンダーのポップアップ通知でお知らせします。
  */
@@ -9,9 +9,10 @@ const EVENT_MINUTES = 15; // 予定の長さ（分）
 
 function doGet() {
   const out = HtmlService.createHtmlOutputFromFile('index')
-    .setTitle('ふせん')
+    .setTitle('ねこのて')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1, viewport-fit=cover')
-    .addMetaTag('apple-mobile-web-app-capable', 'yes');
+    .addMetaTag('apple-mobile-web-app-capable', 'yes')
+    .addMetaTag('apple-mobile-web-app-title', 'ねこのて');
   try { // アイコン（受け付けられない場合は無視）
     out.setFaviconUrl('https://raw.githubusercontent.com/ihitomi-tools/fusen/main/icons/icon-192.png');
   } catch (e) {}
