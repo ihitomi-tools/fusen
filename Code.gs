@@ -18,6 +18,11 @@ function doGet() {
   return out;
 }
 
+// このアプリ自身のURL（画面の下に表示して、スマホで開くのに使う）
+function getAppUrl() {
+  return ScriptApp.getService().getUrl();
+}
+
 // 専用カレンダーを取得（なければ作る）
 function getCal_() {
   const found = CalendarApp.getCalendarsByName(CAL_NAME);

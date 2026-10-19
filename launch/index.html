@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="noindex">
+<title>ねこのて</title>
+<meta name="apple-mobile-web-app-title" content="ねこのて">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon-180.png">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg: #f6f1e7; --panel: #fffdf7; --text: #3a3226; --sub: #8a7e6b; --line: #e4dccb; --accent: #e9967a; --danger: #c0564a; }
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; background: var(--bg); color: var(--text);
+  font-family: 'M PLUS Rounded 1c', 'BIZ UDPGothic', sans-serif;
+  display: grid; place-items: center;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+}
+main { width: 100%; max-width: 420px; text-align: center; }
+img { width: 96px; height: 96px; image-rendering: pixelated; border-radius: 22px; }
+h1 { font-family: 'DotGothic16', 'M PLUS Rounded 1c', sans-serif; font-weight: 400; font-size: 24px; margin: 12px 0 4px; }
+p { font-size: 14px; line-height: 1.7; color: var(--sub); margin: 8px 0; }
+.card { background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 14px; margin-top: 16px; text-align: left; }
+input { width: 100%; font: inherit; font-size: 16px; color: var(--text); background: var(--bg); border: 2px solid var(--line); border-radius: 12px; padding: 10px 12px; outline: none; }
+input:focus { border-color: var(--accent); }
+button, a.btn {
+  display: block; width: 100%; margin-top: 10px; font: inherit; font-size: 16px; text-align: center; text-decoration: none;
+  background: var(--accent); color: #fff; border: none; border-radius: 14px; padding: 12px; cursor: pointer;
+}
+button:disabled { opacity: .45; }
+.err { color: var(--danger); font-size: 13px; min-height: 18px; margin: 6px 0 0; }
+.small { font-size: 12px; }
+a.link { color: var(--sub); }
+ol { margin: 8px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.8; color: var(--text); }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <img src="../icons/icon-192.png" alt="">
+  <h1>ねこのて</h1>
+
+  <div id="going" hidden>
+    <p>ひらいています…🐾</p>
+    <p class="small"><a class="link" href="#" id="change">URLを変える</a></p>
+  </div>
+
+  <div id="setup" hidden>
+    <div class="card" id="askBox">
+      <p style="margin-top:0">はじめに1回だけ、ねこのての<b>ウェブアプリのURL</b>を貼ってね。この端末のブラウザにだけ覚えます（ネットには送りません）。</p>
+      <input type="text" id="url" placeholder="https://script.google.com/macros/s/…/exec" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="err" id="err"></div>
+      <button id="save" disabled>保存してひらく</button>
+    </div>
+    <div class="card" id="doneBox" hidden>
+      <p style="margin-top:0">覚えたよ！ ホーム画面に置くなら：</p>
+      <ol>
+        <li>Safari の下の「共有」ボタンを押す</li>
+        <li>「ホーム画面に追加」を選ぶ</li>
+        <li>名前が「ねこのて」で、猫のアイコンなのを確認して「追加」</li>
+      </ol>
+      <a class="btn" id="open" href="#">ねこのてをひらく</a>
+    </div>
+  </div>
+</main>
+<script>
+var KEY = 'nekonote_url';
+var $ = function (id) { return document.getElementById(id); };
+function get() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+function put(v) { try { localStorage.setItem(KEY, v); return true; } catch (e) { return false; } }
+function drop() { try { localStorage.removeItem(KEY); } catch (e) {} }
+function ok(u) { return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_\-]+\/(exec|dev)(\?.*)?$/.test(u); }
+function showSetup() { $('going').hidden = true; $('setup').hidden = false; $('url').focus(); }
+
+var saved = get();
+if (saved && ok(saved)) {
+  $('going').hidden = false;
+  var t = setTimeout(function () { location.replace(saved); }, 900);
+  $('change').onclick = function (e) { e.preventDefault(); clearTimeout(t); drop(); showSetup(); };
+} else {
+  $('setup').hidden = false;
+}
+
+$('url').addEventListener('input', function () {
+  var v = $('url').value.trim();
+  $('save').disabled = !v;
+  $('err').textContent = '';
+});
+$('save').onclick = function () {
+  var v = $('url').value.trim();
+  if (!ok(v)) { $('err').textContent = 'ウェブアプリのURL（…/exec で終わるもの）を貼ってね'; return; }
+  if (!put(v)) { $('err').textContent = 'この端末では覚えられませんでした（プライベートブラウズかも）'; return; }
+  $('askBox').hidden = true; $('doneBox').hidden = false;
+  $('open').href = v;
+};
+</script>
+</body>
+</html>
